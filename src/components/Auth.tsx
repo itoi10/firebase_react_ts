@@ -5,7 +5,7 @@ Sign-in side
 */
 import React, {useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {auth, provider, storage} from '../firebase';
+import {auth, googleProvider, storage} from '../firebase';
 import styles from './Auth.module.css';
 
 import Avatar from '@mui/material/Avatar';
@@ -54,6 +54,12 @@ const Auth:React.FC = () => {
       password: data.get('password'),
     });
   };
+
+  // Google認証
+  const signInGoogle = async () => {
+    // Google認証のポップアップを表示
+    await auth.signInWithPopup(googleProvider).catch((err) => alert(err.message));
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -118,6 +124,15 @@ const Auth:React.FC = () => {
                 sx={{ mt: 3, mb: 2 }}
               >
                 Sign In
+              </Button>
+
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={signInGoogle}
+              >
+                Sign In with Google
               </Button>
 
               <Copyright sx={{ mt: 5 }} />
