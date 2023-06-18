@@ -3,7 +3,11 @@ MUIのテンプレートを元に作成
 https://mui.com/material-ui/getting-started/templates/
 Sign-in side
 */
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import React, {useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {auth, provider, storage} from '../firebase';
+import styles from './Auth.module.css';
+
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,15 +20,22 @@ import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
 
-function Copyright(props: any) {
+import SendIcon from '@mui/icons-material/Send';
+import CameraIcon from '@mui/icons-material/Camera';
+import EmailIcon from '@mui/icons-material/Email';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
+
+const Copyright = (props: any) => {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
+      <Link color="inherit" href="https://github.com/itoi10">
+        itoi10
+      </Link>
+      {' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
@@ -34,7 +45,7 @@ function Copyright(props: any) {
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export const Auth:React.FC = () => {
+const Auth:React.FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -54,7 +65,7 @@ export const Auth:React.FC = () => {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
+            backgroundImage: 'url(https://images.unsplash.com/photo-1661956601030-fdfb9c7e9e2f)',
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -99,10 +110,7 @@ export const Auth:React.FC = () => {
                 id="password"
                 autoComplete="current-password"
               />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              />
+
               <Button
                 type="submit"
                 fullWidth
@@ -111,18 +119,7 @@ export const Auth:React.FC = () => {
               >
                 Sign In
               </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </Grid>
-              </Grid>
+
               <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
@@ -131,3 +128,5 @@ export const Auth:React.FC = () => {
     </ThemeProvider>
   );
 }
+
+export default Auth

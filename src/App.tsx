@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import styles from './App.module.css';
-import { Auth } from './components/Auth';
+import Auth from './components/Auth';
 import { Feed } from './components/Feed';
 import { login, logout, selectUser } from "./features/userSlice";
 import { auth } from "./firebase";
