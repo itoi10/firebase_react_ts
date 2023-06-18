@@ -55,6 +55,19 @@ const Auth:React.FC = () => {
     });
   };
 
+  // Email, Passwordによる認証
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  // Email,Passwordによるログイン
+  const signInEmail = async () => {
+    await auth.signInWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+  }
+  // Email,Passwordによる新規登録
+  const signUpEmail = async () => {
+    await auth.createUserWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+  }
+
   // Google認証
   const signInGoogle = async () => {
     // Google認証のポップアップを表示
@@ -93,7 +106,7 @@ const Auth:React.FC = () => {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              {isLoginMode ? "ログイン" : "アカウント作成"}
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
@@ -101,30 +114,71 @@ const Auth:React.FC = () => {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                label="メールアドレス"
                 name="email"
                 autoComplete="email"
                 autoFocus
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setEmail(e.target.value)
+                }}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label="パスワード"
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setPassword(e.target.value)
+                }}
               />
 
               <Button
-                type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                startIcon={<EmailIcon />}
+                onClick={
+                  isLoginMode
+                    ? async () => {
+                        try {
+                          await signInEmail();
+                        } catch (err: any) {
+                          alert(err.message);
+                        }
+                      }
+                    : async () => {
+                        try {
+                          await signUpEmail();
+                        } catch (err: any) {
+                          alert(err.message);
+                        }
+                      }
+                }
               >
-                Sign In
+                {isLoginMode ? "Eメールでログイン" : "アカウント作成"}
               </Button>
+
+              <Grid container>
+                <Grid item xs>
+                  <span className={styles.login_reset}>
+                    パスワードを忘れた
+                  </span>
+                </Grid>
+                <Grid item xs>
+                  <span
+                    onClick={() => setIsLoginMode(!isLoginMode)}
+                    className={styles.login_toggleMode}
+                  >
+                    {isLoginMode ? "アカウントを作成する" : "ログイン画面に戻る"}
+                  </span>
+                </Grid>
+              </Grid>
 
               <Button
                 fullWidth
