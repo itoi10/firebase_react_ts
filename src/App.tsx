@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import styles from './App.module.css';
+import { Auth } from './components/Auth';
+import { Feed } from './components/Feed';
 import { login, logout, selectUser } from "./features/userSlice";
 import { auth } from "./firebase";
 
@@ -34,20 +37,18 @@ const  App:React.FC = () => {
   }, [dispatch])
 
   return (
-    <div className="App">
-      {/* テスト */}
-      {user !== null && user !== undefined ? (
-        <>
-        <p>ログインしました</p>
-        <p>{user.uid}</p>
-        <p>{user.displayName}</p>
-        <p>{user.photoUrl}</p>
-        </>
+    <>
+      {user.uid ? (
+        // ログインしているので、Feedコンポーネントを表示
+        <div className={styles.app}>
+          <Feed />
+        </div>
       ) : (
-        <p>ログアウトしました</p>
+        // ログインしていないので、Authコンポーネントを表示
+        <Auth />
       )}
-    </div>
-  );
+    </>
+  )
 }
 
 export default App;
