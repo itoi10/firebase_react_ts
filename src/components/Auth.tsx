@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
+import Modal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
@@ -23,7 +24,8 @@ import Typography from '@mui/material/Typography';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { IconButton } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import IconButton from '@mui/material/IconButton';
 
 
 const Copyright = (props: any) => {
@@ -48,6 +50,20 @@ const generateRandomChar = (length: number = 16): string => {
   return randomChar;
 }
 
+
+const modalStyle = {
+  position: 'absolute' as 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  outline: "none",
+  width: 400,
+  borderRadius: 4,
+  backgroundColor: "white",
+  boxShadow: "0 5 10 rgba(0, 0, 0, 0.3)",
+  padding: 10,
+};
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
@@ -56,9 +72,27 @@ const Auth:React.FC = () => {
   // Email, Passwordによる認証
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoginMode, setIsLoginMode] = useState(true);
   const [username, setUsername] = useState('');
   const [avatarImage, setAvatarImage] = useState<File | null>(null);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  // モーダルの表示状態
+  const [openModal, setOpenModal] = useState(false);
+  // パスワードリセット用のメールアドレス
+  const [emailForReset, setEmailForReset] = useState('');
+
+  // パスワートリセット用のメールを送信
+  const sendResetEmail = async (e: React.MouseEvent<HTMLElement>) => {
+    await auth.sendPasswordResetEmail(emailForReset)
+      .then(() => {
+        setEmailForReset('');
+        setOpenModal(false);
+        alert('パスワードリセット用のメールを送信しました。');
+      })
+      .catch((err) => {
+        setEmailForReset('');
+        alert(err.message)
+      });
+  }
 
   // Email,Passwordによるログイン
   const signInEmail = async () => {
@@ -205,6 +239,11 @@ const Auth:React.FC = () => {
               />
 
               <Button
+                disabled={
+                  isLoginMode
+                    ? !email || password.length < 6
+                    : !username || !email || password.length < 6 || !avatarImage
+                }
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
@@ -232,7 +271,10 @@ const Auth:React.FC = () => {
 
               <Grid container>
                 <Grid item xs>
-                  <span className={styles.login_reset}>
+                  <span
+                    className={styles.login_reset}
+                    onClick={() => setOpenModal(true)}
+                  >
                     パスワードを忘れた
                   </span>
                 </Grid>
@@ -257,6 +299,32 @@ const Auth:React.FC = () => {
 
               <Copyright sx={{ mt: 5 }} />
             </Box>
+
+            {/* パスワードリセット用のモーダル */}
+            <Modal
+              open={openModal}
+              onClose={() => setOpenModal(false)}
+            >
+              <Box sx={modalStyle}>
+                <TextField
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  type='email'
+                  name='email'
+                  label='メールアドレス'
+                  value={emailForReset}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setEmailForReset(e.target.value)
+                  }}
+                />
+                <IconButton onClick={sendResetEmail}>
+                  <SendIcon />
+                </IconButton>
+
+              </Box>
+            </Modal>
+
           </Box>
         </Grid>
       </Grid>
