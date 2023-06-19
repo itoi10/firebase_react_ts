@@ -3,17 +3,16 @@ MUIのテンプレートを元に作成
 https://mui.com/material-ui/getting-started/templates/
 Sign-in side
 */
-import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {auth, googleProvider, storage} from '../firebase';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateUserProfile } from '../features/userSlice';
+import { auth, googleProvider, storage } from '../firebase';
 import styles from './Auth.module.css';
 
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
@@ -21,11 +20,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import SendIcon from '@mui/icons-material/Send';
-import CameraIcon from '@mui/icons-material/Camera';
 import EmailIcon from '@mui/icons-material/Email';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 
 const Copyright = (props: any) => {
@@ -42,6 +38,14 @@ const Copyright = (props: any) => {
   );
 }
 
+// ランダムな文字列を生成
+const generateRandomChar = (length: number = 16): string => {
+  const S = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const randomChar = Array.from(crypto.getRandomValues(new Uint32Array(length)))
+      .map((n) => S[n % S.length]).join('');
+  return randomChar;
+}
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
@@ -55,17 +59,49 @@ const Auth:React.FC = () => {
     });
   };
 
+  const dispatch = useDispatch();
+
   // Email, Passwordによる認証
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [username, setUsername] = useState('');
+  const [avatarImage, setAvatarImage] = useState<File | null>(null);
   // Email,Passwordによるログイン
   const signInEmail = async () => {
     await auth.signInWithEmailAndPassword(email, password).catch((err) => alert(err.message));
   }
   // Email,Passwordによる新規登録
   const signUpEmail = async () => {
-    await auth.createUserWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+    const authUser =  await auth.createUserWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+    let url = '';
+    if (avatarImage) {
+      // ファイル名が衝突しないように、ランダムな文字列を生成
+      const fileName = generateRandomChar() + '_' + avatarImage.name;
+      // アバター画像をstorageにアップロード
+      await storage.ref(`avatars/${fileName}`).put(avatarImage);
+      url = await storage.ref('avatars').child(fileName).getDownloadURL();
+    }
+    // ユーザー情報を更新
+    await authUser?.user?.updateProfile({
+      displayName: username,
+      photoURL: url,
+    });
+    // ユーザー情報をReduxに保存
+    dispatch(updateUserProfile({
+      displayName: username,
+      photoUrl: url,
+    }));
+  }
+
+  // アバター画像設定
+  const onChangeImageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // !をつけることでnullではないことを明示的に示す
+    if (e.target.files![0]) {
+      setAvatarImage(e.target.files![0]);
+      // onChangeが毎回呼ばれるようにするために、inputのvalueを空にする
+      e.target.value = '';
+    }
   }
 
   // Google認証
@@ -170,7 +206,7 @@ const Auth:React.FC = () => {
                     パスワードを忘れた
                   </span>
                 </Grid>
-                <Grid item xs>
+                <Grid item>
                   <span
                     onClick={() => setIsLoginMode(!isLoginMode)}
                     className={styles.login_toggleMode}

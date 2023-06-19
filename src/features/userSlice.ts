@@ -1,6 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../app/store';
 
+
+interface USER {
+  displayName: string;
+  photoUrl: string;
+}
 
 export const userSlice = createSlice({
   name: 'user',
@@ -22,11 +27,15 @@ export const userSlice = createSlice({
       // ログアウト時にstateのユーザー情報を初期化
       state.user = {uid: '', photoUrl: '', displayName: ''};
     },
+    updateUserProfile: (state, action: PayloadAction<USER>) => {
+      state.user.displayName = action.payload.displayName;
+      state.user.photoUrl = action.payload.photoUrl;
+    },
   },
 });
 
 // アプリケーションの他の部分からアクションを使用できるようにする
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateUserProfile } = userSlice.actions;
 // stateの値を取得するための関数
 export const selectUser = (state: RootState) => state.user.user;
 // 作成したスライスのreducerをエクスポート
