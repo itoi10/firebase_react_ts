@@ -50,23 +50,14 @@ const generateRandomChar = (length: number = 16): string => {
 const defaultTheme = createTheme();
 
 const Auth:React.FC = () => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
-
   const dispatch = useDispatch();
-
   // Email, Passwordによる認証
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [username, setUsername] = useState('');
   const [avatarImage, setAvatarImage] = useState<File | null>(null);
+
   // Email,Passwordによるログイン
   const signInEmail = async () => {
     await auth.signInWithEmailAndPassword(email, password).catch((err) => alert(err.message));
@@ -144,7 +135,7 @@ const Auth:React.FC = () => {
             <Typography component="h1" variant="h5">
               {isLoginMode ? "ログイン" : "アカウント作成"}
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Box component="form" noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
