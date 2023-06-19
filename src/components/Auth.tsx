@@ -9,6 +9,7 @@ import { updateUserProfile } from '../features/userSlice';
 import { auth, googleProvider, storage } from '../firebase';
 import styles from './Auth.module.css';
 
+import GoogleIcon from '@mui/icons-material/Google';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -51,18 +52,6 @@ const generateRandomChar = (length: number = 16): string => {
 }
 
 
-const modalStyle = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  outline: "none",
-  width: 400,
-  borderRadius: 4,
-  backgroundColor: "white",
-  boxShadow: "0 5 10 rgba(0, 0, 0, 0.3)",
-  padding: 10,
-};
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -293,8 +282,9 @@ const Auth:React.FC = () => {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 onClick={signInGoogle}
+                startIcon={<GoogleIcon />}
               >
-                Sign In with Google
+                Googleアカウントでログイン
               </Button>
 
               <Copyright sx={{ mt: 5 }} />
@@ -305,14 +295,25 @@ const Auth:React.FC = () => {
               open={openModal}
               onClose={() => setOpenModal(false)}
             >
-              <Box sx={modalStyle}>
+              <Box sx={{
+                position: 'absolute' as 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                outline: "none",
+                width: 400,
+                borderRadius: 4,
+                backgroundColor: "white",
+                boxShadow: "0 5 10 rgba(0, 0, 0, 0.3)",
+                padding: 10,
+              }}>
                 <TextField
                   InputLabelProps={{
                     shrink: true,
                   }}
                   type='email'
                   name='email'
-                  label='メールアドレス'
+                  label='リセット用メールアドレス'
                   value={emailForReset}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setEmailForReset(e.target.value)
