@@ -20,8 +20,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EmailIcon from '@mui/icons-material/Email';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { IconButton } from '@mui/material';
 
 
 const Copyright = (props: any) => {
@@ -154,6 +156,23 @@ const Auth:React.FC = () => {
                     setUsername(e.target.value)
                   }}
                 />
+                <Box textAlign='center'>
+                  <IconButton>
+                    <label>
+                      {/* 画像が選択済みの場合はスタイルを変える */}
+                      <AccountCircleIcon
+                        fontSize='large'
+                        className={avatarImage ? styles.login_addIconLoaded : styles.login_addIcon}
+                      />
+                      {/* ファイルダイアログ */}
+                      <input
+                        className={styles.login_hiddenIcon}
+                        type='file'
+                        onChange={onChangeImageHandler}
+                      />
+                    </label>
+                  </IconButton>
+                </Box>
               </>)}
 
               <TextField
