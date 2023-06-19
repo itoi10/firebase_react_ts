@@ -136,6 +136,26 @@ const Auth:React.FC = () => {
               {isLoginMode ? "ログイン" : "アカウント作成"}
             </Typography>
             <Box component="form" noValidate sx={{ mt: 1 }}>
+
+              {/* 新規登録時はユーザー名とアバター画像登録を表示 */}
+              {!isLoginMode && (<>
+                <TextField
+                  variant='outlined'
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="username"
+                  label="ユーザー名"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                  value={username}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setUsername(e.target.value)
+                  }}
+                />
+              </>)}
+
               <TextField
                 margin="normal"
                 required
