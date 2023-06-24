@@ -27,6 +27,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import IconButton from '@mui/material/IconButton';
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { generateRandomChar } from '../utils/functions';
 
 
@@ -66,7 +68,7 @@ const Auth:React.FC = () => {
 
   // パスワートリセット用のメールを送信
   const sendResetEmail = async (e: React.MouseEvent<HTMLElement>) => {
-    await auth.sendPasswordResetEmail(emailForReset)
+    await sendPasswordResetEmail(auth, emailForReset)
       .then(() => {
         setEmailForReset('');
         setOpenModal(false);
@@ -80,24 +82,26 @@ const Auth:React.FC = () => {
 
   // Email,Passwordによるログイン
   const signInEmail = async () => {
-    await auth.signInWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+    await signInWithEmailAndPassword(auth,email, password).catch((err) => alert(err.message));
   }
   // Email,Passwordによる新規登録
   const signUpEmail = async () => {
-    const authUser =  await auth.createUserWithEmailAndPassword(email, password).catch((err) => alert(err.message));
+    const authUser =  await createUserWithEmailAndPassword(auth,email, password).catch((err) => alert(err.message));
     let url = '';
     if (avatarImage) {
       // ファイル名が衝突しないように、ランダムな文字列を生成
       const fileName = generateRandomChar() + '_' + avatarImage.name;
       // アバター画像をstorageにアップロード
-      await storage.ref(`avatars/${fileName}`).put(avatarImage);
-      url = await storage.ref('avatars').child(fileName).getDownloadURL();
+      await uploadBytes(ref(storage, `avatars/${fileName}`), avatarImage);
+      url = await getDownloadURL(ref(storage, `avatars/${fileName}`));
     }
     // ユーザー情報を更新
-    await authUser?.user?.updateProfile({
-      displayName: username,
-      photoURL: url,
-    });
+    if (authUser && authUser.user) {
+      await updateProfile(authUser.user, {
+        displayName: username,
+        photoURL: url,
+      });
+    }
     // ユーザー情報をReduxに保存
     dispatch(updateUserProfile({
       displayName: username,
@@ -118,7 +122,7 @@ const Auth:React.FC = () => {
   // Google認証
   const signInGoogle = async () => {
     // Google認証のポップアップを表示
-    await auth.signInWithPopup(googleProvider).catch((err) => alert(err.message));
+    await signInWithPopup(auth,googleProvider).catch((err) => alert(err.message));
   }
 
   return (
