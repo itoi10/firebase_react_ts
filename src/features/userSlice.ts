@@ -1,10 +1,9 @@
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../app/store';
-
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { RootState } from '../app/store'
 
 interface USER {
-  displayName: string;
-  photoUrl: string;
+  displayName: string
+  photoUrl: string
 }
 
 export const userSlice = createSlice({
@@ -15,28 +14,28 @@ export const userSlice = createSlice({
       uid: '',
       photoUrl: '',
       displayName: '',
-    }
+    },
   },
   // reducerはstateを更新する関数
   reducers: {
     login: (state, action) => {
       // ログイン成功時にstateにユーザー情報を格納
-      state.user = action.payload;
+      state.user = action.payload
     },
     logout: (state) => {
       // ログアウト時にstateのユーザー情報を初期化
-      state.user = {uid: '', photoUrl: '', displayName: ''};
+      state.user = { uid: '', photoUrl: '', displayName: '' }
     },
     updateUserProfile: (state, action: PayloadAction<USER>) => {
-      state.user.displayName = action.payload.displayName;
-      state.user.photoUrl = action.payload.photoUrl;
+      state.user.displayName = action.payload.displayName
+      state.user.photoUrl = action.payload.photoUrl
     },
   },
-});
+})
 
 // アプリケーションの他の部分からアクションを使用できるようにする
-export const { login, logout, updateUserProfile } = userSlice.actions;
+export const { login, logout, updateUserProfile } = userSlice.actions
 // stateの値を取得するための関数
-export const selectUser = (state: RootState) => state.user.user;
+export const selectUser = (state: RootState) => state.user.user
 // 作成したスライスのreducerをエクスポート
-export default userSlice.reducer;
+export default userSlice.reducer
