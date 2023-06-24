@@ -1,13 +1,15 @@
 import AddPhotoIcon from '@mui/icons-material/AddPhotoAlternate';
 import { Avatar, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
-import firebase from 'firebase';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../features/userSlice';
 import { auth, db, storage } from '../firebase';
 import { generateRandomChar } from '../utils/functions';
 import style from './PostInput.module.css';
+
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const PostInput:React.FC = () => {
   const user = useSelector(selectUser);
@@ -28,11 +30,11 @@ const PostInput:React.FC = () => {
       console.log("Run addToDB")
 
 
-      await db.collection('posts').add({
+      await addDoc(collection(db, "posts"), {
         avatar: user.photoUrl,
         image: imageUrl,
         text: postMessage,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Time the server receives the update
+        timestamp: serverTimestamp(),
         username: user.displayName,
       })
 
@@ -41,24 +43,20 @@ const PostInput:React.FC = () => {
 
     if (postImage) {
       const filename = generateRandomChar() + "_" + postImage.name;
-      const uploadPostImage = storage.ref(`images/${filename}`).put(postImage);
+      const storageRef = ref(storage, `images/${filename}`)
 
-      // Register three observers
-      // https://firebase.google.com/docs/storage/web/upload-files?hl=ja
-      uploadPostImage.on(
-        firebase.storage.TaskEvent.STATE_CHANGED,
-        // progress
-        () => {},
-        // error
-        (err) => { alert(err.message) },
-        // complete
-        async () => {
-          await storage.ref("images").child(filename).getDownloadURL()
-          .then(async (url) => {
+      uploadBytes(storageRef, postImage).then(async (snapshot) => {
+        console.log('Uploaded a blob or file!');
+
+        const storageRef = ref(storage, "images/" + filename)
+
+        getDownloadURL(storageRef).then(async (url) => {
             await addToDB(url);
-          })
-          }
-      )
+          });
+        }).catch((error) => {
+          console.log(error);
+          alert(error.message);
+        });
 
     } else {
       addToDB('');
