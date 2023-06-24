@@ -85,3 +85,7 @@
 .post_buttonDisable {
   display: none;
 }
+.post_comment_avatar_small {
+  width: 24px;
+  height: 24px;
+}
