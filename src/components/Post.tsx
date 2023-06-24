@@ -1,5 +1,11 @@
+
+import { Send } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
-import React from 'react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../features/userSlice';
+import { db } from '../firebase';
 import styles from './Post.module.css';
 
 interface Props {
@@ -12,6 +18,25 @@ interface Props {
 }
 
 const Post:React.FC<Props>= (props) => {
+  const user = useSelector(selectUser)
+  const [comment, setComment] = useState("")
+
+  const newComment = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    console.log("RUNRUN")
+
+    await addDoc(collection(db, "posts", props.postId, "comments"), {
+      avatar: user.photoUrl,
+      text: comment,
+      timestamp: serverTimestamp(),
+      username: user.displayName,
+    })
+
+    setComment("")
+  }
+
+
   return (
     <div className={styles.post}>
       <div className={styles.post_avatar}>
@@ -38,6 +63,28 @@ const Post:React.FC<Props>= (props) => {
             <img src={props.image} alt='post' />
           </div>
         )}
+        <form onSubmit={newComment}>
+          <div className={styles.post_form}>
+            <input
+              className={styles.post_input}
+              type="text"
+              placeholder={"コメントを入力..."}
+              value={comment}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => (
+                setComment(e.target.value)
+              )}
+            />
+            <button
+              disabled={!comment}
+              className={
+                comment ? styles.post_button : styles.post_buttonDisable
+              }
+              type='submit'
+            >
+              <Send className={styles.post_sendIcon}></Send>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )
