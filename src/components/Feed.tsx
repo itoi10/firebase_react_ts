@@ -2,6 +2,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import styles from './Feed.module.css';
+import Post from "./Post";
 import PostInput from './PostInput';
 
 const Feed:React.FC = () => {
@@ -47,9 +48,20 @@ const Feed:React.FC = () => {
     <div className={styles.feed}>
 
       <PostInput />
-      {posts.map(post => (
-        <h3>{post.id}</h3>
-      ))}
+      {posts[0]?.id && (
+        <>
+          {posts.map(post => (
+            <Post key={post.id}
+              postId={post.id}
+              avatar={post.avatar}
+              image={post.image}
+              text={post.text}
+              timestamp={post.timestamp}
+              username={post.username}
+            />
+          ))}
+        </>
+      )}
 
     </div>
   )
